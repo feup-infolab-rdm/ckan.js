@@ -2,7 +2,6 @@ var CKAN = {};
 
 var async = require('async');
 var request = require('request');
-var jsdom = require('jsdom');
 var slugify = require('slugify')
 var isNodeModule = (typeof module !== 'undefined' && module != null && typeof require !== 'undefined');
 
@@ -332,6 +331,22 @@ if (isNodeModule) {
 
         var deleteResourceInPackage = function(file, callback)
         {
+            self.action("resource_delete",
+                file,
+                function (err, response)
+                {
+                    if (response.success)
+                    {
+                        callback(null);
+                    }
+                    else
+                    {
+                        callback(err, response);
+                    }
+                }
+            );
+        }
+
         var updateResourceInPackage = function(file, callback)
         {
             self.action("resource_update",
@@ -420,9 +435,11 @@ if (isNodeModule) {
             },
             function(existingResourceId, cb)
             {
+                //resource with same name has been uploaded to this dataset in the past
                 if(existingResourceId != null)
                 {
                     file.id = existingResourceId;
+                    if (overwriteIfExists)
                     {
                         updateResourceInPackage(file, cb);
                     }
@@ -431,6 +448,7 @@ if (isNodeModule) {
                         cb(1, "Resource already exists in the package and the overwrite flag was not specified.");
                     }
                 }
+                //resource with same name has NEVER been uploaded to this dataset in the past
                 else
                 {
                     createResourceInPackage(cb);
