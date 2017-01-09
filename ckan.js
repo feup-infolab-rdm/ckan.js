@@ -23,87 +23,6 @@ if (isNodeModule) {
         this.apiKey = apiKey;
     };
 
-    /**
-     * Creating a client via username and password authentication
-     * credit https://github.com/jrmerz/node-ckan
-     * @param endpoint
-     * @param username
-     * @param password
-     * @param callback
-     * @constructor
-     */
-
-    my.Client.prototype.authenticate = function(hostUrl, username, password, callback)
-    {
-        var self = this;
-        this.endpoint = _getEndpoint(hostUrl);
-        this.host = hostUrl;
-
-        //credit https://github.com/jrmerz/node-ckan
-        // HACK
-        // TODO: can we get this token from the cookie?
-        function scrapeToken(callback)  {
-
-            request(
-                {
-                    url : self.host + "/user/"+username,
-                    jar : true,
-                    method : "GET"
-                }, function (error, response, body) {
-                if(error == null && response.statusCode == 200)
-                {
-                    jsdom.env(body,
-                        ["http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"],
-                        function(errors, window) {
-                            var apikey = window.$("dd.value > code");
-                            if( apikey.length > 0 ) {
-                                self.apiKey = apikey.html();
-                                callback(null, apikey);
-                            } else {
-                                callback(1, {error:true,message:"login failed"});
-                            }
-                        }
-                    );
-                }
-                else
-                {
-                    callback(1, response);
-                }
-            });
-        }
-
-        var querystring = require('querystring');
-
-        // Build the post string from an object
-        var post_data = querystring.stringify({
-            'login' : username,
-            'password': password,
-            'remember': 63072000
-        });
-
-        request({
-            url : self.host + "/login_generic?" + post_data,
-            jar : true,
-            method : "POST"
-        }, function (error, response, body) {
-            if(!error)
-            {
-                scrapeToken(function(err, result){
-                    if(!err)
-                    {
-                        self.authenticated = true;
-                    }
-
-                    callback(err, self);
-                });
-            }
-            else
-            {
-                callback(1, response)
-            }
-        });
-    }
-
     my.Client.prototype.action = function(name, data, cb) {
         if (name.indexOf('dataset_' === 0)) {
             name = name.replace('dataset_', 'package_');
@@ -411,6 +330,8 @@ if (isNodeModule) {
             );
         };
 
+        var deleteResourceInPackage = function(file, callback)
+        {
         var updateResourceInPackage = function(file, callback)
         {
             self.action("resource_update",
@@ -502,7 +423,6 @@ if (isNodeModule) {
                 if(existingResourceId != null)
                 {
                     file.id = existingResourceId;
-                    if(overwriteIfExists)
                     {
                         updateResourceInPackage(file, cb);
                     }
