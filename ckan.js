@@ -122,7 +122,7 @@ if (isNodeModule) {
             },
             function (err, result) {
                 if (result.success) {
-                    folderResourcesInCkan = result.result.resources;
+                    let folderResourcesInCkan = result.result.resources;
                     let changedResources = [];
                     async.map(result.result.resources, function(resource, callback){
                         if(resource.last_modified > lastSyncDate)
