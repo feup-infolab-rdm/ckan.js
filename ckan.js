@@ -328,14 +328,17 @@ if (isNodeModule) {
                                         {
                                             if(response != null && response.statusCode == 200)
                                             {
+                                                let jsonResponse;
                                                 try{
-                                                    callback(null, JSON.parse(response.toJSON().body));
+                                                    // callback(null, JSON.parse(response.toJSON().body));
+                                                    jsonResponse = JSON.parse(response.toJSON().body);                                                                                
                                                 }
                                                 catch(e)
                                                 {
                                                     var msg = "Upload complete but there was an error parsing the response from the CKAN repository."
-                                                    callback(null, msg);
+                                                    return callback(null, msg);
                                                 }
+                                                callback(null, jsonResponse);
                                             }
                                             else
                                             {
@@ -409,14 +412,17 @@ if (isNodeModule) {
                                         {
                                             if(response != null && response.statusCode == 200)
                                             {
+                                                let jsonResponse;
                                                 try{
-                                                    callback(null, JSON.parse(response.toJSON().body));
+                                                    // callback(null, JSON.parse(response.toJSON().body));
+                                                    jsonResponse = JSON.parse(response.toJSON().body);  
                                                 }
                                                 catch(e)
                                                 {
                                                     var msg = "Upload complete but there was an error parsing the response from the CKAN repository."
-                                                    callback(null, msg);
+                                                    return callback(null, msg);
                                                 }
+                                                callback(null, jsonResponse);
                                             }
                                             else
                                             {
